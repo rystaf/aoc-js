@@ -1,0 +1,4 @@
+*.txt
+*.json
+!sample.txt
+!sample.json

@@ -1,11 +1,11 @@
 main = input => {
   var passwords = input
-  .split('\n')
-  .map(x => ({
-    letter: x.split(' ')[1][0],
-    range: x.split(' ')[0].split('-'),
-    value: x.split(' ')[2]
-  }))
+    .split('\n')
+    .map(x => ({
+      letter: x.split(' ')[1][0],
+      range: x.split(' ')[0].split('-'),
+      value: x.split(' ')[2]
+    }))
 
   var part1 = passwords
     .filter(x => {

@@ -1,20 +1,11 @@
 main = input => {
-  input = input.split('\n\n').map(p => p.replace(/\n/g,' '))
+  var valid = input.split('\n\n').map(p => p.replace(/\n/g,' '))
     .map(p => p.split(' ').reduce((a,b) => ({
       ...a,
       [b.split(':')[0]]: b.split(':')[1]
     }), {}))
-
-  var valid = input
-    .filter(x => [
-      'byr',
-      'iyr',
-      'eyr',
-      'hgt',
-      'hcl',
-      'ecl',
-      'pid',
-    ].every(f => Object.keys(x).includes(f)))
+    .filter(x => ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid',]
+      .every(f => Object.keys(x).includes(f)))
 
   var part1 = valid.length
 

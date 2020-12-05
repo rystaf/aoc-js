@@ -6,15 +6,12 @@ fs.readdirSync(dir)
   .filter(x => x.includes('.txt'))
   .map(x => {
     let input = fs.readFileSync(`${dir}/${x}`, 'utf8')
-    if (input.split('').reverse()[0] == '\n') {
-      input = input.split('').reverse().slice(1).reverse().join('')
-    }
     let outputFile = `${dir}/${x.split('.')[0]}.json`;
     let output = []
     if (fs.existsSync(outputFile)) {
       output = require(outputFile)
     }
-    return [x, input, output]
+    return [x, input.replace(/\n+$/,''), output]
   })
   .forEach(([file, input, output]) => {
     let result = main(input)

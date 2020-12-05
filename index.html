@@ -107,14 +107,11 @@
         state.selected = [year, day]
         const input = await fetch(`https://raw.githubusercontent.com/${state.repo}/main/${year}/${day}/sample.txt`, {mode: 'cors'})
         state.input = await input.text()
-        if (state.input.split('').reverse()[0] == '\n') {
-          state.input = state.input.split('').reverse().slice(1).reverse().join('')
-        }
         if (state.script) state.script.remove()
         state.script = document.createElement('script');
         state.script.crossOrigin = ""
         state.script.onload = function () {
-          state.output = main(state.input)
+          state.output = main(state.input.replace(/\n+$/,''))
           state.code = main.toString()
           m.redraw()
         };
@@ -147,7 +144,7 @@
                 m('div', 'Input '),
                 m('textarea', { oninput: (e) => {
                   state.input = e.target.value
-                  state.output = main(state.input)
+                  state.output = main(state.input.replace(/\n+$/,''))
                   m.redraw()
                 }}, state.input),
               ]),

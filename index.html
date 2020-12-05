@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>AoC JS Solutions</title>
+    <style>
+      body {
+        text-align: center
+      }
+      #app > div {
+        display: inline-block
+      }
+      .days {
+        height: 100vh;
+        vertical-align: top;
+        text-align:right;
+        margin-right: 1em;
+      }
+      .days div {
+        cursor: pointer
+      }
+      .solution {
+        text-align: left;
+        width: 42em;
+      }
+      .solution > div {
+        margin: 1em 0;
+      }
+      .input div {
+        vertical-align: top;
+        display: inline-block;
+        margin-right: .7em; 
+      }
+      .selected {
+        font-weight: bold
+      }
+      textarea {
+        height: 7em;
+      }
+      input {
+        width: 10em;
+      }
+      h1,h3 {
+        margin: 0
+      }
+      h3 {
+        font-size: 1.4em
+      }
+      h2 {
+        margin-top:0
+      }
+    </style>
+    <script src="https://unpkg.com/mithril@2.0.4/mithril.min.js"></script>
+    <link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.1/styles/default.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.1/highlight.min.js"></script>
+
+  </head>
+  <body>
+    <h1>Advent of Code</h1>
+    <div id="app"></div>
+    <script type="text/javascript">
+      const state = {
+        selected: [],
+        solutions: {},
+        repo: 'rystaf/advent-of-code-js',
+        input: '',
+        output: [],
+        code: ''
+      }
+      var get = async (url) => {
+        const response = await fetch(url, { mode: 'cors' })
+        return response.json()
+      }
+      window.onload = async () => {
+        let files = JSON.parse(localStorage.getItem('files'))
+        if (window.location.hostname != 'localhost' || !files) {
+          const { commit: { sha: tree_sha} } = await get(`https://api.github.com/repos/${state.repo}/branches/main`)
+          const response = await get(`https://api.github.com/repos/${state.repo}/git/trees/${tree_sha}?recursive=true`)
+          files = response.tree
+          localStorage.setItem('files', JSON.stringify(files))
+        }
+        state.solutions = files
+          .map(x => x.path)
+          .filter(x => /^\d+\/\d+$/.test(x))
+          .reduce((a, b) => {
+            let [year, day] = b.split('/')
+            a[year] = a[year] || []
+            a[year].push(day)
+            return a
+          }, {})
+        m.redraw();
+      }
+      const codeBlock = {
+        view: (vnode) => m('code', {class:'javascript'}, vnode.children),
+        onupdate: (vnode) => {
+          if (vnode.children[0]) {
+            vnode.dom.innerHTML = vnode.children[0]
+            hljs.highlightBlock(vnode.dom)
+          }
+        }
+      }
+      const getSolution = async (year, day) => {
+        state.selected = [year, day]
+        const input = await fetch(`https://raw.githubusercontent.com/${state.repo}/main/${year}/${day}/sample.txt`, {mode: 'cors'})
+        state.input = await input.text()
+        if (state.input.split('').reverse()[0] == '\n') {
+          state.input = state.input.split('').reverse().slice(1).reverse().join('')
+        }
+        if (state.script) state.script.remove()
+        state.script = document.createElement('script');
+        state.script.crossOrigin = ""
+        state.script.onload = function () {
+          state.output = main(state.input)
+          state.code = main.toString()
+          m.redraw()
+        };
+        state.script.src =`https://${state.repo.split('/')[0]}.github.io/${state.repo.split('/')[1]}/${year}/${day}/main.js`
+        document.head.appendChild(state.script)
+      }
+      const app = {
+        view: () => {
+          if (Object.keys(state.solutions).length && !state.code) {
+            let y = Object.keys(state.solutions)[0]
+            getSolution(y, state.solutions[y][0])
+          }
+          return [
+            m('h2', m('a', { href: `https://github.com/${state.repo}`, target: '_blank' }, 'Javascript Solutions')),
+            m('div', { class: 'days' }, Object.keys(state.solutions).map(year => [
+              m('h3', year),
+                state.solutions[year].map(day => m('div', { 
+                  class: !(state.selected[0] == year && state.selected[1] == day) || 'selected',
+                  onclick: () => getSolution(year, day)
+                }, `Day ${day}`))
+            ])),
+            m('div', {class: 'solution'}, [
+              m('a', { 
+                href: '#',
+                onclick: () => window.open(`https://adventofcode.com/${state.selected[0]}/day/${state.selected[1]}`,
+                  "_blank",
+                  "width=900,height=800,status=no,location=no,menubar=no,titlebar=no")
+              }, 'Show prompt'),
+              m('div', {class: 'input'}, [
+                m('div', 'Input '),
+                m('textarea', { oninput: (e) => {
+                  state.input = e.target.value
+                  state.output = main(state.input)
+                  m.redraw()
+                }}, state.input),
+              ]),
+              m('div', [
+                m('div', [ 'Part 1 ', m('input', { type: 'text', readonly: true, value: state.output[0] }) ]),
+                m('div', [ 'Part 2 ', m('input', { type: 'text', readonly: true, value: state.output[1] }) ]),
+              ]),
+              m('pre', m(codeBlock, state.code)),
+            ])
+          ]
+        },
+      }
+      m.mount(document.getElementById('app'), app);
+    </script>
+  </body>
+</html>

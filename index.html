@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>AoC JS Solutions</title>
     <style>
       body {
@@ -18,13 +19,21 @@
         vertical-align: top;
         text-align:right;
         margin-right: 1em;
+        margin-top: .5em;
       }
       .days div {
-        cursor: pointer
+        cursor: pointer;
+        user-select: none;
+      }
+      .days div:hover {
+        text-decoration: underline
       }
       .solution {
         text-align: left;
         width: 42em;
+        padding-left: 1em;
+        padding-top: .5em;
+        border-left: 1px solid #c8c8c8;
       }
       .solution > div {
         margin: 1em 0;
@@ -32,16 +41,28 @@
       .input div {
         vertical-align: top;
         display: inline-block;
-        margin-right: .7em; 
       }
       .selected {
-        font-weight: bold
+        font-weight: bold;
+        cursor: default !important;
+        text-decoration: none !important;
       }
       textarea {
         height: 7em;
       }
+      pre {
+        border: 1px solid #c8c8c8;
+        border-radius: 4px;
+      }
       input {
-        width: 10em;
+        width: 6em;
+      }
+      .label {
+        display: inline-block;
+        width: 3.5em;
+      }
+      .solution > div > div:first-child {
+        margin-bottom: .5em;
       }
       h1,h3 {
         margin: 0
@@ -134,14 +155,13 @@
                 }, `Day ${day}`))
             ])),
             m('div', {class: 'solution'}, [
-              m('a', { 
-                href: '#',
+              m('button', { 
                 onclick: () => window.open(`https://adventofcode.com/${state.selected[0]}/day/${state.selected[1]}`,
                   "_blank",
                   "width=900,height=800,status=no,location=no,menubar=no,titlebar=no")
               }, 'Show prompt'),
               m('div', {class: 'input'}, [
-                m('div', 'Input '),
+                m('div', {class: 'label'}, 'Input '),
                 m('textarea', { oninput: (e) => {
                   state.input = e.target.value
                   state.output = main(state.input.replace(/\n+$/,''))
@@ -149,8 +169,8 @@
                 }}, state.input),
               ]),
               m('div', [
-                m('div', [ 'Part 1 ', m('input', { type: 'text', readonly: true, value: state.output[0] }) ]),
-                m('div', [ 'Part 2 ', m('input', { type: 'text', readonly: true, value: state.output[1] }) ]),
+                m('div', [ m('div', {class: 'label'}, 'Part 1'), m('input', { type: 'text', readonly: true, value: state.output[0] }) ]),
+                m('div', [ m('div', {class: 'label'}, 'Part 2'), m('input', { type: 'text', readonly: true, value: state.output[1] }) ]),
               ]),
               m('pre', m(codeBlock, state.code)),
             ])

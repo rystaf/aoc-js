@@ -1,4 +1,5 @@
 main = input => {
+
   var passwords = input
     .split('\n')
     .map(x => ({
@@ -19,4 +20,5 @@ main = input => {
     .length
 
   return [part1, part2]
+
 }

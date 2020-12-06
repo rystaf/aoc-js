@@ -1,10 +1,10 @@
 main = input => {
+
   var valid = input.split('\n\n').map(p => p.replace(/\n/g,' '))
-    .map(p => p.split(' ').reduce((a,b) => ({
-      ...a,
+    .map(p => p.split(' ').reduce((a, b) => ({ ...a,
       [b.split(':')[0]]: b.split(':')[1]
     }), {}))
-    .filter(x => ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid',]
+    .filter(x => ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid']
       .every(f => Object.keys(x).includes(f)))
 
   var part1 = valid.length
@@ -23,10 +23,11 @@ main = input => {
         ? hgt.replace(/\D/g, "").btwn(150, 193)
         : hgt.replace(/\D/g, "").btwn(59, 76),
       ({hcl}) => /^#[\da-f]{6}$/.test(hcl),
-      ({ecl}) => ['amb','blu','brn','gry','grn','hzl','oth'].some(c => ecl == c),
+      ({ecl}) => /^(amb|blu|brn|gry|grn|hzl|oth)$/.test(ecl),
       ({pid}) => /^\d{9}$/.test(pid),
     ].every(f => f(x)))
     .length
 
   return [part1, part2]
+
 }

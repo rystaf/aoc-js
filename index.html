@@ -77,11 +77,9 @@
         margin-top:0
       }
     </style>
-    <script src="https://unpkg.com/mithril@2.0.4/mithril.min.js"></script>
-    <link rel="stylesheet"
-      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.1/styles/default.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/mithril/2.0.4/mithril.min.js"></script>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.1/styles/default.min.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.1/highlight.min.js"></script>
-
   </head>
   <body>
     <h1>Advent of Code</h1>
@@ -95,15 +93,11 @@
         output: [],
         code: ''
       }
-      var get = async (url) => {
-        const response = await fetch(url, { mode: 'cors' })
-        return response.json()
-      }
       window.onload = async () => {
         let files = JSON.parse(localStorage.getItem('files'))
         if (window.location.hostname != 'localhost' || !files) {
-          const { commit: { sha: tree_sha} } = await get(`https://api.github.com/repos/${state.repo}/branches/main`)
-          const response = await get(`https://api.github.com/repos/${state.repo}/git/trees/${tree_sha}?recursive=true`)
+          const { commit: { sha: tree_sha} } = await m.request(`https://api.github.com/repos/${state.repo}/branches/main`)
+          const response = await m.request(`https://api.github.com/repos/${state.repo}/git/trees/${tree_sha}?recursive=true`)
           files = response.tree
           localStorage.setItem('files', JSON.stringify(files))
         }
@@ -116,6 +110,16 @@
             a[year].push(day)
             return a
           }, {})
+        if (Object.keys(state.solutions).length && !state.code) {
+          let selected = [Object.keys(state.solutions)[0], 1]
+          if (window.location.hash) {
+            let hash = window.location.hash.slice(1).split('-')
+            if (state.solutions[hash[0]] && state.solutions[hash[0]].includes(hash[1])) {
+              selected = hash
+            }
+          }
+          getSolution(...selected)
+        }
         m.redraw();
       }
       const codeBlock = {
@@ -143,49 +147,36 @@
         document.head.appendChild(state.script)
       }
       const app = {
-        view: () => {
-          if (Object.keys(state.solutions).length && !state.code) {
-            let selected = [Object.keys(state.solutions)[0], 1]
-            if (window.location.hash) {
-              let hash = window.location.hash.slice(1).split('-')
-              if (state.solutions[hash[0]] && state.solutions[hash[0]].includes(hash[1])) {
-                selected = hash
-              }
-            }
-            getSolution(...selected)
-          }
-          return [
-            m('h2', m('a', { href: `https://github.com/${state.repo}`, target: '_blank' }, 'Javascript Solutions')),
-            m('div', { class: 'days' }, Object.keys(state.solutions).map(year => [
-              m('h3', year),
-                state.solutions[year].map(day => m('a', { 
-                  class: !(state.selected[0] == year && state.selected[1] == day) || 'selected',
-                  href: `#${year}-${day}`,
-                  onclick: () => getSolution(year, day)
-                }, `Day ${day}`))
-            ])),
-            m('div', {class: 'solution'}, [
-              m('button', { 
-                onclick: () => window.open(`https://adventofcode.com/${state.selected[0]}/day/${state.selected[1]}`,
-                  "_blank",
-                  "width=900,height=800,status=no,location=no,menubar=no,titlebar=no")
-              }, 'Show prompt'),
-              m('div', {class: 'input'}, [
-                m('div', {class: 'label'}, 'Input '),
-                m('textarea', { oninput: (e) => {
-                  state.input = e.target.value
-                  state.output = main(state.input.replace(/\n+$/,''))
-                  m.redraw()
-                }}, state.input),
-              ]),
-              m('div', [
-                m('div', [ m('div', {class: 'label'}, 'Part 1'), m('input', { type: 'text', readonly: true, value: state.output[0] }) ]),
-                m('div', [ m('div', {class: 'label'}, 'Part 2'), m('input', { type: 'text', readonly: true, value: state.output[1] }) ]),
-              ]),
-              m('pre', m(codeBlock, state.code)),
-            ])
-          ]
-        },
+        view: () => [
+          m('h2', m('a', { href: `https://github.com/${state.repo}`, target: '_blank' }, 'Javascript Solutions')),
+          m('div', { class: 'days' }, Object.keys(state.solutions).map(year => [
+            m('h3', year),
+              state.solutions[year].map(day => m('a', { 
+                class: !(state.selected[0] == year && state.selected[1] == day) || 'selected',
+                href: `#${year}-${day}`,
+                onclick: () => getSolution(year, day)
+              }, `Day ${day}`))
+          ])),
+          m('div', {class: 'solution'}, [
+            m('button', { 
+              onclick: () => window.open(`https://adventofcode.com/${state.selected[0]}/day/${state.selected[1]}`,
+                "_blank",
+                "width=900,height=800,status=no,location=no,menubar=no,titlebar=no")
+            }, 'Show prompt'),
+            m('div', {class: 'input'}, [
+              m('div', {class: 'label'}, 'Input '),
+              m('textarea', { oninput: (e) => {
+                state.input = e.target.value
+                state.output = main(state.input.replace(/\n+$/,''))
+              }}, state.input),
+            ]),
+            m('div', [
+              m('div', [ m('div', {class: 'label'}, 'Part 1'), m('input', { type: 'text', readonly: true, value: state.output[0] }) ]),
+              m('div', [ m('div', {class: 'label'}, 'Part 2'), m('input', { type: 'text', readonly: true, value: state.output[1] }) ]),
+            ]),
+            m('pre', m(codeBlock, state.code)),
+          ])
+        ]
       }
       m.mount(document.getElementById('app'), app);
     </script>

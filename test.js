@@ -15,5 +15,5 @@ fs.readdirSync(dir)
   })
   .forEach(([file, input, output]) => {
     let result = main(input)
-    console.log(file, result, ...output.map((x,i) => Math.round(result[i]/x*100)+'%'))
+    console.log(file, result, ...output.map((x,i) => (x ? Math.round(result[i]/x*100) : (result[i]?0:100))+'%'))
   })

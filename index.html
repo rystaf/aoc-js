@@ -21,12 +21,15 @@
         margin-right: 1em;
         margin-top: .5em;
       }
-      .days div {
+      .days a {
+        display: block;
         cursor: pointer;
         user-select: none;
+        text-decoration: none;
+        color: black;
       }
-      .days div:hover {
-        text-decoration: underline
+      .days a:hover {
+        text-decoration: underline !important
       }
       .solution {
         text-align: left;
@@ -142,15 +145,22 @@
       const app = {
         view: () => {
           if (Object.keys(state.solutions).length && !state.code) {
-            let y = Object.keys(state.solutions)[0]
-            getSolution(y, state.solutions[y][0])
+            let selected = [Object.keys(state.solutions)[0], 1]
+            if (window.location.hash) {
+              let hash = window.location.hash.slice(1).split('-')
+              if (state.solutions[hash[0]] && state.solutions[hash[0]].includes(hash[1])) {
+                selected = hash
+              }
+            }
+            getSolution(...selected)
           }
           return [
             m('h2', m('a', { href: `https://github.com/${state.repo}`, target: '_blank' }, 'Javascript Solutions')),
             m('div', { class: 'days' }, Object.keys(state.solutions).map(year => [
               m('h3', year),
-                state.solutions[year].map(day => m('div', { 
+                state.solutions[year].map(day => m('a', { 
                   class: !(state.selected[0] == year && state.selected[1] == day) || 'selected',
+                  href: `#${year}-${day}`,
                   onclick: () => getSolution(year, day)
                 }, `Day ${day}`))
             ])),

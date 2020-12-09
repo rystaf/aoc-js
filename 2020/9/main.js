@@ -1,20 +1,21 @@
 main = input => {
+
   const numbers = input.split('\n').map(x => Number(x))
 
-  const [part1] = numbers.filter((x,i,s) => i < 25
-    ? false
-    : s.slice(i-25, s.length - i < 25 ? s.length : i).every((y, iy, sy) => !sy.includes(x-y)))
-  var part2 = 0
-  numbers.map((x,i,s) => {
-    return s.slice(i).reduce((a,b,ii) => {
-      if (a+b == part1 && !part2) {
-        part2 = [
-          numbers.slice(i,ii+i).sort()[0],
-          numbers.slice(i,ii+i).sort().reverse()[0]]
-          .reduce((a,b) =>a+b,0)
-      }
-      return a+b
-    },0)
-  })
-  return [part1,part2]
+  const g = numbers.length > 50 ? 25 : 5
+
+  const part1 = numbers.find((x, i, s) => i < g ? false
+    : s.slice(i - g, s.length - i < g ? s.length : i)
+      .every((y, iy, sy) => !sy.includes(x - y)))
+
+  const [part2] = numbers.map((x, i, s) => s.slice(i)
+    .reduce((a,b,ii) => [
+      a[0] ? a[0] : a[1] + b == part1 && 
+        Math.max(...numbers.slice(i, i+ii)) +
+        Math.min(...numbers.slice(i, i+ii)),
+      a[1] + b,
+    ],[0, 0])).find(x => x[0])
+
+  return [part1, part2]
+
 }

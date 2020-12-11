@@ -151,7 +151,7 @@
           m('h2', m('a', { href: `https://github.com/${state.repo}`, target: '_blank' }, 'Javascript Solutions')),
           m('div', { class: 'days' }, Object.keys(state.solutions).map(year => [
             m('h3', year),
-              state.solutions[year].map(day => m('a', { 
+              state.solutions[year].sort((a,b)=>a-b).map(day => m('a', { 
                 class: !(state.selected[0] == year && state.selected[1] == day) || 'selected',
                 href: `#${year}-${day}`,
                 onclick: () => getSolution(year, day)

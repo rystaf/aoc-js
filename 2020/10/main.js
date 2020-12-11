@@ -10,12 +10,10 @@ main = input => {
     ], [0, 0, 0])
     .reduce((a, b, i) => i ? a*b : a, 1)
 
-  const findAdapters = (a) => {
-    const found = a.filter(x => (x - a[0]) > 0 && (x - a[0]) < 4 ) 
-    if (found.length) return found.map(f => findAdapters(a.slice(a.indexOf(f))))
-      .reduce((x, y) => x + y,0)
-    else return 1
-  }  
+  const findAdapters = (a) => a
+    .filter(x => (x - a[0]) > 0 && (x - a[0]) < 4 ) 
+    .map(f => findAdapters(a.slice(a.indexOf(f))))
+    .reduce((x, y, i) => x + y - !i, 1)
 
   const part2 = findAdapters([0, ...adapters, adapters[adapters.length-1]+3])
 

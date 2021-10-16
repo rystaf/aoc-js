@@ -155,7 +155,7 @@
                 class: !(state.selected[0] == year && state.selected[1] == day) || 'selected',
                 href: `#${year}-${day}`,
                 onclick: () => getSolution(year, day)
-              }, `Day ${day}`))
+              }, `Day ${parseInt(day)}`))
           ])),
           m('div', {class: 'solution'}, [
             m('button', { 

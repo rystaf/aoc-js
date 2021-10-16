@@ -6,7 +6,8 @@
     <title>AoC JS Solutions</title>
     <style>
       body {
-        text-align: center
+        text-align: center;
+        font-size: 16px;
       }
       #app {
         white-space: nowrap;
@@ -33,7 +34,7 @@
       }
       .solution {
         text-align: left;
-        width: 42em;
+        width: 55em;
         padding-left: 1em;
         padding-top: .5em;
         border-left: 1px solid #c8c8c8;
@@ -76,10 +77,23 @@
       h2 {
         margin-top:0
       }
+      @media(prefers-color-scheme:dark){
+				body { background:#393939; color:#fff; }
+				a { color:#3395ff; }
+        .days a { color: #e8e7ec }
+        .solution {
+          border-color: #535353
+        }
+        input[type="text"], textarea {
+          background-color: #464444;
+          color: #fff;
+        }
+			}
     </style>
     <script src="//cdnjs.cloudflare.com/ajax/libs/mithril/2.0.4/mithril.min.js"></script>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.1/styles/default.min.css">
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.1/highlight.min.js"></script>
+    <link media="(prefers-color-scheme:light)" rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+    <link media="(prefers-color-scheme:dark)" rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/agate.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
   </head>
   <body>
     <h1>Advent of Code</h1>

@@ -111,7 +111,8 @@
             return a
           }, {})
         if (Object.keys(state.solutions).length && !state.code) {
-          let selected = [Object.keys(state.solutions)[0], 1]
+          const firstYear = Object.keys(state.solutions)[0]
+          let selected = [firstYear, state.solutions[firstYear][0] ]
           if (window.location.hash) {
             let hash = window.location.hash.slice(1).split('-')
             if (state.solutions[hash[0]] && state.solutions[hash[0]].includes(hash[1])) {

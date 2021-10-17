@@ -8,13 +8,10 @@
       body {
         text-align: center;
         font-size: 16px;
+        font-family: sans-serif;
       }
-      #app {
-        white-space: nowrap;
-      }
-      #app > div {
-        display: inline-block
-      }
+      #app { white-space: nowrap; }
+      #app > div { display: inline-block }
       .days {
         height: 100vh;
         vertical-align: top;
@@ -29,8 +26,10 @@
         text-decoration: none;
         color: black;
       }
-      .days a:hover {
-        text-decoration: underline !important
+      .d:hover { text-decoration: underline !important; }
+      .selected {
+        font-weight: bold;
+        text-decoration: none !important;
       }
       .solution {
         text-align: left;
@@ -46,21 +45,12 @@
         vertical-align: top;
         display: inline-block;
       }
-      .selected {
-        font-weight: bold;
-        cursor: default !important;
-        text-decoration: none !important;
-      }
-      textarea {
-        height: 7em;
-      }
+      textarea { height: 7em; }
       pre {
         border: 1px solid #c8c8c8;
         border-radius: 4px;
       }
-      input {
-        width: 6em;
-      }
+      input { width: 6em; }
       .label {
         display: inline-block;
         width: 3.5em;
@@ -68,22 +58,17 @@
       .solution > div > div:first-child {
         margin-bottom: .5em;
       }
-      h1,h3 {
-        margin: 0
+      h1 { margin: 0; }
+      h3 { 
+        font-size: 1.4em;
+        margin: .25em 0em;
       }
-      h3 {
-        font-size: 1.4em
-      }
-      h2 {
-        margin-top:0
-      }
+      h2 { margin-top:0; }
       @media(prefers-color-scheme:dark){
 				body { background:#393939; color:#fff; }
 				a { color:#3395ff; }
         .days a { color: #e8e7ec }
-        .solution {
-          border-color: #535353
-        }
+        .solution { border-color: #535353; }
         input[type="text"], textarea {
           background-color: #464444;
           color: #fff;
@@ -167,7 +152,7 @@
           m('div', { class: 'days' }, Object.keys(state.solutions).map(year => [
             m('h3', year),
               state.solutions[year].sort((a,b)=>a-b).map(day => m('a', { 
-                class: !(state.selected[0] == year && state.selected[1] == day) || 'selected',
+                class: (state.selected[0] == year && state.selected[1] == day) ? 'selected' : 'd',
                 href: `#${year}-${day}`,
                 onclick: () => getSolution(year, day)
               }, `Day ${parseInt(day)}`))

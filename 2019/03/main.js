@@ -11,7 +11,7 @@ main = input => {
         if (direction=='L') point[0] -= amount
         if (direction=='U') point[1] += amount
         if (direction=='D') point[1] -= amount
-        return [...points, point] 
+        return [...points, point]
       }, [[0,0]]))
 
   const lineContainsPoint = (line, point) => {
@@ -67,7 +67,7 @@ main = input => {
         if (steps2.length) {
           const steps1 = instructions[0].slice(0, i)
             .map(x => Number(x.substr(1)))
-            .reduce((a,b)=>a+b,traceSteps) 
+            .reduce((a,b)=>a+b,traceSteps)
           xStepSums.push(...steps2.map(x => x+steps1))
         }
         trace[0] += diff[0]

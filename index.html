@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="https://raw.githubusercontent.com/rystaf/aoc-js/main/star.svg">
     <title>AoC JS Solutions</title>
     <style>
       body {
@@ -11,9 +12,9 @@
         font-family: sans-serif;
       }
       #app { white-space: nowrap; }
-      #app > div { display: inline-block }
       .days {
         height: 100vh;
+        display: inline-block;
         vertical-align: top;
         text-align:right;
         margin-right: 1em;
@@ -33,6 +34,7 @@
       }
       .solution {
         text-align: left;
+        display: inline-block;
         width: 55em;
         padding-left: 1em;
         padding-top: .5em;
@@ -63,7 +65,16 @@
         font-size: 1.4em;
         margin: .25em 0em;
       }
-      h2 { margin-top:0; }
+      h2 { margin:0; }
+      .star { height: 30px; }
+      .star img {
+        animation: rotation 2s infinite linear;
+        height: 100%;
+      }
+      @keyframes rotation {
+        from { transform: rotate(0deg) }
+        to {transform: rotate(359deg) }
+      }
       @media(prefers-color-scheme:dark){
 				body { background:#393939; color:#fff; }
 				a { color:#3395ff; }
@@ -86,6 +97,7 @@
     <script type="text/javascript">
       const state = {
         selected: [],
+        loading: true,
         solutions: {},
         repo: 'rystaf/aoc-js',
         input: '',
@@ -133,6 +145,7 @@
       }
       const getSolution = async (year, day) => {
         state.selected = [year, day]
+        state.loading = true
         const input = await fetch(`https://raw.githubusercontent.com/${state.repo}/main/${year}/${day}/sample.txt`, {mode: 'cors'})
         state.input = await input.text()
         if (state.script) state.script.remove()
@@ -141,6 +154,7 @@
         state.script.onload = function () {
           state.output = main(state.input.replace(/\n+$/,''))
           state.code = main.toString()
+          state.loading = false
           m.redraw()
         };
         state.script.src =`https://${state.repo.split('/')[0]}.github.io/${state.repo.split('/')[1]}/${year}/${day}/main.js`
@@ -149,13 +163,14 @@
       const app = {
         view: () => [
           m('h2', m('a', { href: `https://github.com/${state.repo}`, target: '_blank' }, 'Javascript Solutions')),
+          m('div', { class: 'star'}, state.loading ? m('img', { src: 'https://raw.githubusercontent.com/rystaf/aoc-js/main/star.svg' }) : ''),
           m('div', { class: 'days' }, Object.keys(state.solutions).map(year => [
             m('h3', year),
-              state.solutions[year].sort((a,b)=>a-b).map(day => m('a', { 
-                class: (state.selected[0] == year && state.selected[1] == day) ? 'selected' : 'd',
-                href: `#${year}-${day}`,
-                onclick: () => getSolution(year, day)
-              }, `Day ${parseInt(day)}`))
+            state.solutions[year].sort((a,b)=>a-b).map(day => m('a', {
+              class: (state.selected[0] == year && state.selected[1] == day) ? 'selected' : 'd',
+              href: `#${year}-${day}`,
+              onclick: () => getSolution(year, day)
+            }, `Day ${parseInt(day)}`))
           ])),
           m('div', {class: 'solution'}, [
             m('button', { 
@@ -165,7 +180,7 @@
             }, 'Show prompt'),
             m('div', {class: 'input'}, [
               m('div', {class: 'label'}, 'Input '),
-              m('textarea', { oninput: (e) => {
+              m('textarea', { onchange: (e) => {
                 state.input = e.target.value
                 state.output = main(state.input.replace(/\n+$/,''))
               }}, state.input),

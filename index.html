@@ -134,6 +134,12 @@
         }
         m.redraw();
       }
+      window.onhashchange = () => {
+        let hash = window.location.hash.slice(1).split('-')
+        if (state.solutions[hash[0]] && state.solutions[hash[0]].includes(hash[1])) {
+          getSolution(...hash)
+        }
+      }
       const codeBlock = {
         view: (vnode) => m('code', {class:'javascript'}, vnode.children),
         onupdate: (vnode) => {
@@ -169,7 +175,6 @@
             state.solutions[year].sort((a,b)=>a-b).map(day => m('a', {
               class: (state.selected[0] == year && state.selected[1] == day) ? 'selected' : 'd',
               href: `#${year}-${day}`,
-              onclick: () => getSolution(year, day)
             }, `Day ${parseInt(day)}`))
           ])),
           m('div', {class: 'solution'}, [

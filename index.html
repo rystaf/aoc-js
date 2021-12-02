@@ -139,6 +139,7 @@
         if (state.solutions[hash[0]] && state.solutions[hash[0]].includes(hash[1])) {
           getSolution(...hash)
         }
+        m.redraw()
       }
       const codeBlock = {
         view: (vnode) => m('code', {class:'javascript'}, vnode.children),

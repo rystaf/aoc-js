@@ -122,23 +122,12 @@
             return a
           }, {})
         if (Object.keys(state.solutions).length && !state.code) {
-          const firstYear = Object.keys(state.solutions)[0]
-          let selected = [firstYear, state.solutions[firstYear][0] ]
-          if (window.location.hash) {
-            let hash = window.location.hash.slice(1).split('-')
-            if (state.solutions[hash[0]] && state.solutions[hash[0]].includes(hash[1])) {
-              selected = hash
-            }
-          }
-          getSolution(...selected)
+          getSolution()
         }
         m.redraw();
       }
       window.onhashchange = () => {
-        let hash = window.location.hash.slice(1).split('-')
-        if (state.solutions[hash[0]] && state.solutions[hash[0]].includes(hash[1])) {
-          getSolution(...hash)
-        }
+        getSolution()
         m.redraw()
       }
       const codeBlock = {
@@ -146,12 +135,18 @@
         onupdate: (vnode) => {
           if (vnode.children[0]) {
             vnode.dom.innerHTML = vnode.children[0]
-            hljs.highlightBlock(vnode.dom)
+            hljs.highlightElement(vnode.dom)
           }
         }
       }
-      const getSolution = async (year, day) => {
-        state.selected = [year, day]
+      const getSolution = async () => {
+        const lastYear = Object.keys(state.solutions).reverse()[0]
+        state.selected = [lastYear, state.solutions[lastYear].reverse()[0] ]
+        let hash = window.location.hash.slice(1).split('-')
+        if (state.solutions[hash[0]] && state.solutions[hash[0]].includes(hash[1])) {
+          state.selected = hash
+        }
+        const [year, day] = state.selected
         state.loading = true
         const input = await fetch(`https://raw.githubusercontent.com/${state.repo}/main/${year}/${day}/sample.txt`, {mode: 'cors'})
         state.input = await input.text()

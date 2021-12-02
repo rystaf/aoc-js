@@ -17,17 +17,14 @@ main = input => {
   const part1 = horizontalSum * verticalSum
 
   let aim = 0
-  const position = [0, 0]
-  for (let i = 0; i < steps.length; i += 1) {
-    const [direction, distance] = steps[i]
-    if (direction == 'forward') {
-      position[0] += distance
-      position[1] += (distance * aim)
-    }
-    if (direction == 'up') aim -= distance
-    if (direction == 'down') aim += distance
+  let correctedVerticalSum = 0
+  for (const step of steps) {
+    const [direction, distance] = step
+    if (direction == 'forward') correctedVerticalSum += (distance * aim)
+    else if (direction == 'up') aim -= distance
+    else if (direction == 'down') aim += distance
   }
-  const part2 = position.reduce((a,b) => a*b,1)
+  const part2 = horizontalSum * correctedVerticalSum
 
   return [part1, part2]
 }

@@ -5,7 +5,7 @@ main = input => {
       .split(',')
       .map(n => parseInt(n)))
 
-  const [,...boards] = input // Array destructuring to grab everything except first element
+  const [,...boards] = input // Grab everything except first element
     .split(/\r?\n\r?\n/) // Split on blank lines (double linebreak)
     .map(board => board
       .split(/\r?\n|\r/) // Split on line breaks
@@ -14,7 +14,7 @@ main = input => {
         .filter(n => n) // Remove blank items due to double spacing
         .map(n => parseInt(n)))
       .filter(row => row.length) // Remove empty rows due to trailing breaks
-      .flatMap(x => x)
+      .flatMap(x => x) // ended up just flattening this structure and using math
     )
 
   const bingoScore = (findLastWinner=false) => {
@@ -26,12 +26,15 @@ main = input => {
       for (const bi in boards) {
         if (winners.includes(bi)) continue
         const i = boards[bi].indexOf(n)
-        if (i > -1) {
-          matches[bi][Math.floor(i / 5)][i % 5] = n
-          matches[bi][(i % 5)+5][Math.floor(i / 5)] = n
-        }
-        if(matches[bi].find(row => row.filter(m => !isNaN(m)).length == 5 && row.includes(n))) {
-          const score = n * boards[bi].filter(bn => !numbers.slice(0,ni+1).includes(bn)).reduce((a,b)=>a+b,0)
+        if (i == -1) continue
+        // save matches
+        matches[bi][Math.floor(i / 5)][i % 5] = n // horizontal
+        matches[bi][(i % 5)+5][Math.floor(i / 5)] = n // vertical
+        // check for bingo
+        if (matches[bi].find(row => row.filter(m => !isNaN(m)).length == 5)) {
+          const score = n * boards[bi]
+            .filter(bn => !numbers.slice(0, ni+1).includes(bn)) // find unmatched numbers
+            .reduce((a, b)=> a + b, 0)
           winners.push(bi)
           if (!findLastWinner) return score
           else if (winners.length == boards.length) return score

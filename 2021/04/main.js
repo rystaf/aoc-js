@@ -17,23 +17,28 @@ main = input => {
       .flatMap(x => x)
     )
 
-  const part1 = () => {
+  const bingoScore = (findLastWinner=false) => {
+    const winners = []
+    // Creates a 10x5 2d array to track vertical and horizontal matches for each board
     const matches = boards.map(() => Array.apply(null, Array(10))
       .map(()=>Array.apply(null, Array(5))))
-    let bingo
     for (const [ni, n] of numbers.entries()) {
       for (const bi in boards) {
+        if (winners.includes(bi)) continue
         const i = boards[bi].indexOf(n)
         if (i > -1) {
           matches[bi][Math.floor(i / 5)][i % 5] = n
           matches[bi][(i % 5)+5][Math.floor(i / 5)] = n
         }
-        bingo = matches[bi].find(row => row.filter(m => !isNaN(m)).length == 5)
-        if (bingo) {
-          return n * boards[bi].filter(bn => !numbers.slice(0,ni+1).includes(bn)).reduce((a,b)=>a+b,0)
+        if(matches[bi].find(row => row.filter(m => !isNaN(m)).length == 5 && row.includes(n))) {
+          const score = n * boards[bi].filter(bn => !numbers.slice(0,ni+1).includes(bn)).reduce((a,b)=>a+b,0)
+          winners.push(bi)
+          if (!findLastWinner) return score
+          else if (winners.length == boards.length) return score
         }
       }
     }
+    return score
   }
-  return [part1(), 0]
+  return [bingoScore(), bingoScore(true)]
 }

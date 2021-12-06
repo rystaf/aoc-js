@@ -1,4 +1,6 @@
 *.txt
 *.json
+prompt.md
+.SESSION
 !sample*.txt
 !sample*.json

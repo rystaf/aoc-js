@@ -50,14 +50,13 @@
       textarea { height: 7em; }
       pre {
         border: 1px solid #c8c8c8;
-        border-radius: 4px;
       }
-      input { width: 6em; }
+      input { width: 10em; }
       .label {
         display: inline-block;
         width: 3.5em;
       }
-      .solution > div > div:first-child {
+      .solution > div > div {
         margin-bottom: .5em;
       }
       h1 { margin: 0; }
@@ -79,7 +78,7 @@
 				body { background:#393939; color:#fff; }
 				a { color:#3395ff; }
         .days a { color: #e8e7ec }
-        .solution { border-color: #535353; }
+        .solution, pre { border-color: #535353; }
         input[type="text"], textarea {
           background-color: #464444;
           color: #fff;
@@ -90,7 +89,7 @@
 			}
     </style>
     <script src="//cdnjs.cloudflare.com/ajax/libs/mithril/2.0.4/mithril.min.js"></script>
-    <link media="(prefers-color-scheme:light)" rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+    <link media="(prefers-color-scheme:light)" rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/vs.min.css">
     <link media="(prefers-color-scheme:dark)" rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/agate.min.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
   </head>
@@ -157,7 +156,9 @@
         state.script = document.createElement('script');
         state.script.crossOrigin = ""
         state.script.onload = function () {
+          let startTime = performance.now()
           state.output = main(state.input.replace(/\n+$/,''))
+          state.time = performance.now() - startTime
           state.code = main.toString()
           state.loading = false
           m.redraw()
@@ -192,6 +193,7 @@
             m('div', [
               m('div', [ m('div', {class: 'label'}, 'Part 1'), m('input', { type: 'text', readonly: true, value: state.output[0] }) ]),
               m('div', [ m('div', {class: 'label'}, 'Part 2'), m('input', { type: 'text', readonly: true, value: state.output[1] }) ]),
+              m('div', [ m('div', {class: 'label'}, 'Time'), ...(state.time == undefined ? [] : [m('small', state.time+" ms")])])
             ]),
             m('pre', m(codeBlock, state.code)),
           ])

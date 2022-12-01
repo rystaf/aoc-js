@@ -7,11 +7,17 @@ const querystring = require('querystring');
 const now = new Date()
 const arg = process.argv.slice(2).filter(x => !x.includes('-'))
 const flag = process.argv.slice(2).filter(x => x.includes('-')).map(x => x.slice(1)).reduce((a,b) => ({...a,[b]:true}), {})
-const year = arg[1] || (now.getMonth() == 11 ? now.getFullYear() : now.GetFullYear()-1)
-const day = (arg[0] || (now.getMonth() == 11 ? now.getDate().toString() : "31")).padStart(2, "0")
+let y = arg[1]
+let d = arg[0]
+if (arg[0]?.length == 4) {
+  y = arg[0]
+  d = arg[1]
+}
+const year = y || (now.getMonth() == 11 ? now.getFullYear() : now.getFullYear()-1)
+const day = (d || (now.getMonth() == 11 ? now.getDate().toString() : "1")).padStart(2, "0")
 const file = arg[2]
 const dir = `./${year}/${day}`
-const session = !fs.existsSync('.SESSION') || fs.readFileSync('.SESSION', 'utf8').replace(/\n+$/,'').trim()
+const session = fs.existsSync('.SESSION') ? fs.readFileSync('.SESSION', 'utf8').replace(/\n+$/,'').trim() : false
 const readline = require("readline");
 const rl = readline.createInterface({
     input: process.stdin,
@@ -39,11 +45,14 @@ const request = (options, postData) => new Promise((resolve, reject) => {
     }
   }
   const req = https.request(options, (response) => {
-      let data = ''
-      response.on('data', chunk => {
-          data = data + chunk.toString();
-      })
-      response.on('end', () => resolve(data))
+    let data = ''
+    response.on('data', chunk => {
+        data = data + chunk.toString();
+    })
+    response.on('end', () => {
+      if (response.statusCode > 200) return reject(data)
+      resolve(data)
+    })
   })
   req.on('error', (error) => reject(error))
   if (postData) req.write(payload)
@@ -58,9 +67,7 @@ const fetchPrompt = async () => {
       port: 443,
       path: `/${year}/day/${parseInt(day)}`,
       method: 'GET',
-      headers: {
-        'Cookie': `session=${session}`
-      }
+      ...(session ? { headers: {'Cookie': `session=${session}`} } : {}),
     })
 
     fs.writeFileSync(`${dir}/prompt.html`, html
@@ -108,7 +115,7 @@ const test = async() => {
       if (file == 'my.txt') myResult = result
       console.log(file, result, ...(output ? output.map((x,i) => (x ? Math.round(result[i]/x*100) : (result[i]?0:100))+'%'):[]))
     })
-  if (flag.w && session) {
+  if (session) {
     let part = 0
     if (fs.existsSync(`${dir}/my.json`)) {
       var output = require(`${dir}/my.json`)

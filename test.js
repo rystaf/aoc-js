@@ -14,7 +14,7 @@ if (arg[0]?.length == 4) {
   d = arg[1]
 }
 const year = y || (now.getMonth() == 11 ? now.getFullYear() : now.getFullYear()-1)
-const day = (d || (now.getMonth() == 11 ? now.getDate().toString() : "1")).padStart(2, "0")
+const day = (d || ((now.getMonth() == 11 && now.getFullYear() == y) ? now.getDate().toString() : "1")).padStart(2, "0")
 const file = arg[2]
 const dir = `./${year}/${day}`
 const session = fs.existsSync('.SESSION') ? fs.readFileSync('.SESSION', 'utf8').replace(/\n+$/,'').trim() : false
@@ -24,13 +24,15 @@ const rl = readline.createInterface({
     output: process.stdout,
     terminal: false
 });
+let setup = false
 
 if (!fs.existsSync(dir)) {
   if (!fs.existsSync(`./${year}`)) fs.mkdirSync(`./${year}`)
   fs.mkdirSync(dir)
-  fs.writeFileSync(`${dir}/main.js`, 'main = input => { return [0,0] }')
+  fs.writeFileSync(`${dir}/main.js`, 'main = input => {\n var part1=0\n var part2=0\n return [part1, part2]\n}')
   fs.writeFileSync(`${dir}/sample.txt`, '')
   fs.writeFileSync(`${dir}/sample.json`, '[0,0]')
+  setup = true
 }
 
 require(`${dir}/main.js`)
@@ -59,7 +61,7 @@ const request = (options, postData) => new Promise((resolve, reject) => {
   req.end();
 })
 
-const fetchPrompt = async () => {
+const fetchPrompt = () => new Promise(async (resolve, reject) => {
   console.log('fetching prompt')
   if (!fs.existsSync(`${dir}/prompt.html`)) {
     const html = await request({
@@ -74,19 +76,26 @@ const fetchPrompt = async () => {
       .split(/<\/?article[a-z ="-]*>/)
       .filter((x,i) => i % 2)
       .join('\n\n'))
+
+    var answers = Array.from(html.matchAll(/<p>Your puzzle answer was <code>([0-9]+)<\/code>/g))
+      .map(x => x.find((a,i)=>i==1))
+      .map(x => parseInt(x))
+    fs.writeFileSync(`${dir}/my.json`, JSON.stringify(answers))
   }
 
   exec(`pandoc --columns=80 ${dir}/prompt.html -t gfm -o ${dir}/prompt.md`, (err, stdout, stderr) => {
     if (err || stderr) {
       console.error(err || stderr);
-      return
+      return reject()
     }
     fs.unlinkSync(`${dir}/prompt.html`)
+    resolve()
   })
-}
+})
 
 const test = async() => {
   console.log(dir)
+  if (setup) return
   if (!fs.existsSync(`${dir}/prompt.md`)) await fetchPrompt()
   if (session && !fs.existsSync(`${dir}/my.txt`)) {
     console.log('fetching input')
@@ -140,9 +149,13 @@ const test = async() => {
       console.log(message)
       rl.close();
       if (message.includes("That's the right answer")){
-        let out = output || []
-        out[part] = myResult[part]
-        fs.writeFileSync(`${dir}/my.json`, JSON.stringify(out))
+        if (part == 0) {
+          await fetchPrompt()
+        } else {
+          let out = output || []
+          out[part] = myResult[part]
+          fs.writeFileSync(`${dir}/my.json`, JSON.stringify(out))
+        }
       }
     })
   }

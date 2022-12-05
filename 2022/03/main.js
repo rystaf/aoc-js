@@ -14,11 +14,11 @@ main = input => {
   var part2 = rucksacks
     .map(x => x.split(''))
     .reduce((a,b,i) => {
-    n = Math.trunc(i/3)
-    if (!a[n]) a[n] = []
-    a[n].push(b)
-    return a
-  },[])
+      n = Math.trunc(i/3)
+      if (!a[n]) a[n] = []
+      a[n].push(b)
+      return a
+    },[])
     .map(r => r[0].find(item => r[1].includes(item) && r[2].includes(item)))
     .map(t => t.charCodeAt())
     .map(p => p - (p > 96 ? 96 : 64-26))

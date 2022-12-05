@@ -1,5 +1,8 @@
 main = input => {
-  var pairs = input.split('\n').map(x => x.split(',').map(a => a.split('-').map(n => parseInt(n))))
+  var pairs = input.split('\n')
+    .map(x => x.split(',')
+      .map(a => a.split('-')
+        .map(n => parseInt(n))))
 
   var part1 = pairs
     .filter(p => (

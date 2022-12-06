@@ -169,7 +169,7 @@
         state.script.onload = function () {
           let startTime = performance.now()
           state.output = main(state.input.replace(/\n+$/,''))
-          if (visualize) visualize()
+          if (typeof visualize != 'undefined') visualize()
           state.time = performance.now() - startTime
           state.code = main.toString()
           state.loading = false
@@ -206,7 +206,7 @@
                   m('textarea', { onchange: (e) => {
                     state.input = e.target.value
                     state.output = main(state.input.replace(/\n+$/,''))
-                    if (visualize) visualize()
+                    if (typeof visualize != 'undefined') visualize()
                   }}, state.input),
                 ]),
                 m('div', {class:'output'}, [

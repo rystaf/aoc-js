@@ -1,17 +1,8 @@
 main = input => {
-  var part1
-  for(let i = 4; i < input.length; i += 1){
-    if (input.slice(i, i+4).split('').filter((x,i,s)=>s.indexOf(x) == i).length == 4) {
-      part1 = i+4
-      break
-    }
-  }
-  var part2
-  for(let i = 14; i < input.length; i += 1){
-    if (input.slice(i, i+14).split('').filter((x,i,s)=>s.indexOf(x) == i).length == 14) {
-      part2 = i+14
-      break
-    }
-  }
+  var findMarker = n => input
+    .split('')
+    .findIndex((x, i, s)=>s.slice(i, i+n).filter((x,i,s)=>s.indexOf(x)==i).length == n)+n
+  var part1 = findMarker(4)
+  var part2 = findMarker(14)
   return [part1, part2]
 }

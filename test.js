@@ -79,7 +79,6 @@ const fetchPrompt = () => new Promise(async (resolve, reject) => {
 
     var answers = Array.from(html.matchAll(/<p>Your puzzle answer was <code>([0-9]+)<\/code>/g))
       .map(x => x.find((a,i)=>i==1))
-      .map(x => parseInt(x))
     fs.writeFileSync(`${dir}/my.json`, JSON.stringify(answers))
   }
 
@@ -122,13 +121,16 @@ const test = async() => {
     .forEach(([file, input, output]) => {
       const result = main(input)
       if (file == 'my.txt') myResult = result
-      console.log(file, result, ...(output ? output.map((x,i) => (x ? Math.round(result[i]/x*100) : (result[i]?0:100))+'%'):[]))
+      console.log(file, result, ...(output ? output
+        .map((x,i) => isNaN(x)
+          ? (x == result[i])
+          : (x ? Math.round(result[i]/x*100) : (result[i]?0:100))+'%'):[]))
     })
   if (session) {
     let part = 0
     if (fs.existsSync(`${dir}/my.json`)) {
       var output = require(`${dir}/my.json`)
-      if (output.filter(x => !isNaN(x)).length == 2) return
+      if (output.length == 2) return
       if (output[0] && !output[1]) part = 1
     }
     rl.question(`Submit ${myResult[part]} for part ${part+1}? `, async answer => {

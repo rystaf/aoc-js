@@ -40,7 +40,7 @@
         padding-top: .5em;
         border-left: 1px solid #c8c8c8;
       }
-      .solution > div {
+      .input  {
         margin: 1em 0;
       }
       .input div {
@@ -56,8 +56,19 @@
         display: inline-block;
         width: 3.5em;
       }
-      .solution > div > div {
+      .output > div {
         margin-bottom: .5em;
+      }
+      #top {
+        display: flex;
+      }
+      .visual {
+        flex-grow: 1;
+        margin: 1em;
+        text-align:center;
+      }
+      #visual {
+        display: inline-block;
       }
       h1 { margin: 0; }
       h3 { 
@@ -85,6 +96,7 @@
         }
         .selected {
           text-shadow: 0 0 5px;
+          color: #ffa !important;
         }
 			}
     </style>
@@ -129,8 +141,7 @@
         m.redraw();
       }
       window.onhashchange = () => {
-        getSolution()
-        m.redraw()
+        window.location.reload()
       }
       const codeBlock = {
         view: (vnode) => m('code', {class:'javascript'}, vnode.children),
@@ -158,12 +169,17 @@
         state.script.onload = function () {
           let startTime = performance.now()
           state.output = main(state.input.replace(/\n+$/,''))
+          if (visualize) visualize()
           state.time = performance.now() - startTime
           state.code = main.toString()
           state.loading = false
           m.redraw()
         };
-        state.script.src =`https://${state.repo.split('/')[0]}.github.io/${state.repo.split('/')[1]}/${year}/${day}/main.js`
+        if (window.location.hostname == "localhost") {
+          state.script.src = `http://${window.location.host}/${year}/${day}/main.js`
+        } else {
+          state.script.src =`https://${state.repo.split('/')[0]}.github.io/${state.repo.split('/')[1]}/${year}/${day}/main.js`
+        }
         document.head.appendChild(state.script)
       }
       const app = {
@@ -183,23 +199,39 @@
                 "_blank",
                 "width=900,height=800,status=no,location=no,menubar=no,titlebar=no")
             }, 'Show prompt'),
-            m('div', {class: 'input'}, [
-              m('div', {class: 'label'}, 'Input '),
-              m('textarea', { onchange: (e) => {
-                state.input = e.target.value
-                state.output = main(state.input.replace(/\n+$/,''))
-              }}, state.input),
-            ]),
-            m('div', [
-              m('div', [ m('div', {class: 'label'}, 'Part 1'), m('input', { type: 'text', readonly: true, value: state.output[0] }) ]),
-              m('div', [ m('div', {class: 'label'}, 'Part 2'), m('input', { type: 'text', readonly: true, value: state.output[1] }) ]),
-              m('div', [ m('div', {class: 'label'}, 'Time'), ...(state.time == undefined ? [] : [m('small', state.time+" ms")])])
+            m('div', {id: "top"}, [
+              m('div', [
+                m('div', {class: 'input'}, [
+                  m('div', {class: 'label'}, 'Input '),
+                  m('textarea', { onchange: (e) => {
+                    state.input = e.target.value
+                    state.output = main(state.input.replace(/\n+$/,''))
+                    if (visualize) visualize()
+                  }}, state.input),
+                ]),
+                m('div', {class:'output'}, [
+                  m('div', [ m('div', {class: 'label'}, 'Part 1'), m('input', { type: 'text', readonly: true, value: state.output[0] }) ]),
+                  m('div', [ m('div', {class: 'label'}, 'Part 2'), m('input', { type: 'text', readonly: true, value: state.output[1] }) ]),
+                  m('div', [ m('div', {class: 'label'}, 'Time'), ...(state.time == undefined ? [] : [m('small', state.time+" ms")])])
+                ]),
+              ]),
+              m('div', {class: 'visual'}, m('div', {id: 'visual'})),
             ]),
             m('pre', m(codeBlock, state.code)),
           ])
         ]
       }
       m.mount(document.getElementById('app'), app);
+    </script>
+    <script type="text/javascript">
+      if (typeof WebSocket != 'undefined' && window.location.hostname == "localhost") {
+        var ws = new WebSocket('ws://'+window.location.hostname+':8080/');
+        var x = false;
+        ws.onmessage = function() {
+          if (x) window.location.reload();
+          x = true;
+        }
+      }
     </script>
   </body>
 </html>

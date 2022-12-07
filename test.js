@@ -119,7 +119,7 @@ const test = async() => {
       return [filename, input, output]
     })
     .forEach(([file, input, output]) => {
-      const result = main(input)
+      const result = main(input.replace(/\r/g,''))
       if (file == 'my.txt') myResult = result
       console.log(file, result, ...(output ? output
         .map((x,i) => isNaN(x)

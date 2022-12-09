@@ -29,9 +29,7 @@ main = input => {
   setSize(hd)
 
   var sumDirs = dir => dir.children
-    .reduce((a,b) => a + (b.children
-      ? (sumDirs(b) + (b.size <= 100000
-        ? b.size : 0)) : 0), 0)
+    .reduce((a,b) => a + (b.children ? (sumDirs(b) + (b.size <= 100000 ? b.size : 0)) : 0), 0)
 
   var part1 = sumDirs(hd)
 

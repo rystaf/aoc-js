@@ -5,12 +5,10 @@ main = input => {
   let s = 0
   let X = 1
   let sum = 0
-  let crt = []
-  while (i<instructions.length) {
+  crt = []
+  while (i < instructions.length) {
     var [m,n] = instructions[i]
     crt[c-1] = (Math.abs(X-((c-1)%40)) <= 1) ? "#" : "."
-    //console.log(c, X, m, n)
-    //console.log(crt.join(''))
     if ([20,60,100,140,180,220].includes(c)){
       sum += (X*c)
     }
@@ -38,4 +36,18 @@ main = input => {
 }
 
 visualize = () => {
+  let c = []
+  for (let i = 0; i < 240; i+=40) {
+    c.push(crt.slice(i, i+40))
+  }
+  let viz = {
+    view: ()=> m('div', { style: "text-align:left"}, c
+      .map(r => m('div',{style: "display:flex; flex-direction:row"},r
+        .map(x=> m('div', {style: {
+          width: "1em",
+          height: "1em",
+          "background-color": x == "#" ? "black":""
+        }})))))
+  }
+  m.mount(document.getElementById('visual'), viz);
 }

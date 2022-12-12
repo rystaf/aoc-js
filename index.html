@@ -156,13 +156,12 @@
         const lastYear = Object.keys(state.solutions).reverse()[0]
         state.selected = [lastYear, state.solutions[lastYear].reverse()[0] ]
         let hash = window.location.hash.slice(1).split('-')
-        if (state.solutions[hash[0]] && state.solutions[hash[0]].includes(hash[1])) {
+        if (state.solutions[hash[0]] && (state.solutions[hash[0]].includes(hash[1])
+         || window.location.hostname == "localhost")) {
           state.selected = hash
         }
         const [year, day] = state.selected
         state.loading = true
-        const input = await fetch(`https://raw.githubusercontent.com/${state.repo}/main/${year}/${day}/sample.txt`, {mode: 'cors'})
-        state.input = await input.text()
         if (state.script) state.script.remove()
         state.script = document.createElement('script');
         state.script.crossOrigin = ""
@@ -175,11 +174,15 @@
           state.loading = false
           m.redraw()
         };
-        if (window.location.hostname == "localhost") {
-          state.script.src = `http://${window.location.host}/${year}/${day}/main.js`
-        } else {
-          state.script.src =`https://${state.repo.split('/')[0]}.github.io/${state.repo.split('/')[1]}/${year}/${day}/main.js`
+        state.input = localStorage.getItem(state.selected.join("-"))
+        const host = window.location.hostname == "localhost"
+          ?`http://${window.location.host}`
+          :`https://${state.repo.split('/')[0]}.github.io/${state.repo.split('/')[1]}`
+        if (!state.input) {
+          const input = await fetch(`${host}/${year}/${day}/sample.txt`, {mode: 'cors'})
+          state.input = await input.text()
         }
+        state.script.src = `${host}/${year}/${day}/main.js`
         document.head.appendChild(state.script)
       }
       const app = {
@@ -194,19 +197,20 @@
             }, `Day ${parseInt(day)}`))
           ])),
           m('div', {class: 'solution'}, [
-            m('button', { 
-              onclick: () => window.open(`https://adventofcode.com/${state.selected[0]}/day/${parseInt(state.selected[1])}`,
-                "_blank",
-                "width=900,height=800,status=no,location=no,menubar=no,titlebar=no")
-            }, 'Show prompt'),
+            m('a', { 
+              href: `https://adventofcode.com/${state.selected[0]}/day/${parseInt(state.selected[1])}`,
+              target: "_blank",
+            }, !state.selected[0] || `https://adventofcode.com/${state.selected[0]}/day/${parseInt(state.selected[1])}`),
             m('div', {id: "top"}, [
               m('div', [
                 m('div', {class: 'input'}, [
                   m('div', {class: 'label'}, 'Input '),
                   m('textarea', { onchange: (e) => {
+
                     state.input = e.target.value
                     state.output = main(state.input.replace(/\n+$/,''))
                     if (typeof visualize != 'undefined') visualize()
+                    localStorage.setItem(state.selected.join('-'), state.input)
                   }}, state.input),
                 ]),
                 m('div', {class:'output'}, [

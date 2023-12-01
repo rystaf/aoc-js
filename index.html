@@ -189,7 +189,7 @@
         view: () => [
           m('h2', m('a', { href: `https://github.com/${state.repo}`, target: '_blank' }, 'Javascript Solutions')),
           m('div', { class: 'star'}, state.loading ? m('img', { src: 'https://raw.githubusercontent.com/rystaf/aoc-js/main/star.svg' }) : ''),
-          m('div', { class: 'days' }, Object.keys(state.solutions).map(year => [
+          m('div', { class: 'days' }, Object.keys(state.solutions).sort((a,b)=>b-a).map(year => [
             m('h3', year),
             state.solutions[year].sort((a,b)=>a-b).map(day => m('a', {
               class: (state.selected[0] == year && state.selected[1] == day) ? 'selected' : 'd',

@@ -71,9 +71,11 @@
         display: inline-block;
       }
       h1 { margin: 0; }
-      h3 { 
+      summary {
         font-size: 1.4em;
         margin: .25em 0em;
+        cursor: pointer;
+        font-weight: bold;
       }
       h2 { margin:0; }
       .star { height: 30px; }
@@ -190,11 +192,13 @@
           m('h2', m('a', { href: `https://github.com/${state.repo}`, target: '_blank' }, 'Javascript Solutions')),
           m('div', { class: 'star'}, state.loading ? m('img', { src: 'https://raw.githubusercontent.com/rystaf/aoc-js/main/star.svg' }) : ''),
           m('div', { class: 'days' }, Object.keys(state.solutions).sort((a,b)=>b-a).map(year => [
-            m('h3', year),
-            state.solutions[year].sort((a,b)=>a-b).map(day => m('a', {
-              class: (state.selected[0] == year && state.selected[1] == day) ? 'selected' : 'd',
-              href: `#${year}-${day}`,
-            }, `Day ${parseInt(day)}`))
+            m('details', { open: state.selected[0] == year }, [
+              m('summary', year),
+              state.solutions[year].sort((a,b)=>a-b).map(day => m('a', {
+                class: (state.selected[0] == year && state.selected[1] == day) ? 'selected' : 'd',
+                href: `#${year}-${day}`,
+              }, `Day ${parseInt(day)}`))
+            ])
           ])),
           m('div', {class: 'solution'}, [
             m('a', { 

@@ -14,7 +14,7 @@ if (arg[0]?.length == 4) {
   d = arg[1]
 }
 const year = y || (now.getMonth() == 11 ? now.getFullYear() : now.getFullYear()-1)
-const day = (d || ((now.getMonth() == 11 && now.getFullYear() == y) ? now.getDate().toString() : "1")).padStart(2, "0")
+const day = (d || ((now.getMonth() == 11 && now.getFullYear() == year) ? now.getDate().toString() : "1")).padStart(2, "0")
 const file = arg[2]
 const dir = `./${year}/${day}`
 const session = fs.existsSync('.SESSION') ? fs.readFileSync('.SESSION', 'utf8').replace(/\n+$/,'').trim() : false

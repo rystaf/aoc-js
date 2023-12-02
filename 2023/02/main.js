@@ -1,9 +1,8 @@
 main = input => {
   return input.split('\n').reduce((total, line, i, s) => {
-    //if (s.length > 10) return total
     const [gameid, games] = line.split(': ')
     const [,id] = gameid.split(' ')
-    b = games.split('; ').reduce((bag, game) => {
+    const b = games.split('; ').reduce((bag, game) => {
       game.split(', ').forEach(group => {
         let [n, color] = group.split(' ')
         n = parseInt(n)

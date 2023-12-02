@@ -16,6 +16,7 @@ main = input => {
     if (b.red <= 12 && b.green <= 13 && b.blue <= 14) {
       total[0] += parseInt(id)
     }
+    total[1] += (b.red * b.green * b.blue)
     return total
   }, [0,0])
 }
